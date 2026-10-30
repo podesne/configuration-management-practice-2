@@ -12,3 +12,13 @@ def load_graph(config):
     else:
         loader = MavenRepository(config.repo).dependencies
     return build_graph(config.package, loader, config.filter)
+
+
+def load_reverse_source(config):
+    """Для обратного поиска прочитать весь JSON или достижимый Maven-граф."""
+    if config.test:
+        source = read_test_repository(config.repo)
+        if config.package not in source:
+            raise ValueError("Начальный пакет отсутствует в репозитории")
+        return source
+    return load_graph(config)
