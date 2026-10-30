@@ -1,15 +1,20 @@
-"""Запуск первого этапа."""
+"""Запуск второго этапа."""
 
 import sys
 
-from .config import parse_config, print_config
+from .config import parse_config
+from .maven import MavenRepository
 
 
 def main(arguments=None):
-    """Проверить параметры, показать значения и вернуть код завершения."""
+    """Показать прямые зависимости и вернуть код завершения."""
     try:
         config = parse_config(arguments)
-        print_config(config)
+        if config.test:
+            raise ValueError("Тестовый JSON доступен с третьего этапа")
+        repository = MavenRepository(config.repo)
+        for package, _ in repository.dependencies(config.package, root=True):
+            print(package)
         return 0
     except (ValueError, OSError) as error:
         print(f"Ошибка: {error}", file=sys.stderr)
