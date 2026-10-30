@@ -1,22 +1,19 @@
-"""Запуск второго этапа."""
+"""Запуск третьего этапа."""
 
 import sys
 
+from .application import load_graph
 from .config import parse_config
-from .maven import MavenRepository
+from .graph import print_graph
 
 
 def main(arguments=None):
-    """Показать прямые зависимости и вернуть код завершения."""
+    """Построить граф, вывести связи и вернуть код завершения."""
     try:
         config = parse_config(arguments)
-        if config.test:
-            raise ValueError("Тестовый JSON доступен с третьего этапа")
-        repository = MavenRepository(config.repo)
-        for package, _ in repository.dependencies(config.package, root=True):
-            print(package)
+        print_graph(load_graph(config))
         return 0
-    except (ValueError, OSError) as error:
+    except (ValueError, OSError, RecursionError) as error:
         print(f"Ошибка: {error}", file=sys.stderr)
         return 1
 
